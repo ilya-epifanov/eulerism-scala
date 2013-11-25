@@ -112,41 +112,6 @@ object Polynomial {
     }
   }
 
-  def groebnerBasis(ps: Seq[Polynomial]): PolynomialBasis = gröbnerBasis(ps)
-
-  def gröbnerBasis(ps: Seq[Polynomial]): PolynomialBasis = buchbergersAlgorithm(ps)
-
-  @tailrec
-  private[poly] def build(checked: List[Polynomial], left: List[Polynomial]): Seq[Polynomial] = {
-    left match {
-      case l :: ls =>
-        build(checked ++ List(l), ls ++ checkOne(l, checked, left))
-      case Nil => checked
-    }
-  }
-
-  def checkOne(f: Polynomial, checked: List[Polynomial], left: List[Polynomial]): List[Polynomial] = {
-    if (checked.isEmpty) {
-      Nil
-    } else {
-      if (f.lpp coprimeUpToCoeff checked.head.lpp) // Product Criterion
-        return checkOne(f, checked.tail, left)
-
-      val s = (f sPoly checked.head) reduceByBasis (checked ++ left)
-      if (s.nonZero)
-        s :: checkOne(f, checked.tail, s :: left)
-      else
-        checkOne(f, checked.tail, left)
-    }
-  }
-
-  def buchbergersAlgorithm(ps: Seq[Polynomial]): PolynomialBasis = {
-    ps.toList match {
-      case h :: t => PolynomialBasis(build(List(h), t))
-      case Nil => PolynomialBasis(Seq.empty)
-    }
-  }
-
   implicit object DefaultOrdering extends Ordering[Polynomial] {
     def compare(x: Polynomial, y: Polynomial): Int = {
       Ordering.Iterable[Monomial](Monomial.DefaultExactOrdering).compare(x.monomials, y.monomials)

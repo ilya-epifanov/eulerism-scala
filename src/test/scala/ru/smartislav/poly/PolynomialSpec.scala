@@ -1,7 +1,6 @@
 package ru.smartislav.poly
 
 import org.scalacheck.{Gen, Prop}
-import spire.math.Rational
 import ru.smartislav.SpecBase
 
 class PolynomialSpec extends SpecBase {
@@ -23,7 +22,8 @@ class PolynomialSpec extends SpecBase {
     a isReducible a must beTrue
   }
 
-  "Polynomial reduction by any basis terminates" ! Prop.forAll(nonZeroPolynomial, Gen.listOf(nonZeroPolynomial)) { (p, b) =>
+  "Polynomial reduction by any basis terminates" ! Prop.forAll(nonZeroPolynomial, Gen.listOf(nonZeroPolynomial)) {
+    (p, b) =>
     p reduceByBasis b
     true must beTrue
   }
@@ -42,27 +42,26 @@ class PolynomialSpec extends SpecBase {
   "SPOL example 1" ! {
     // from http://www.scholarpedia.org/article/Groebner_bases (section: Syzygy property)
     val a = Polynomial(
-      Monomial("x" -> 1, "y" -> 1),
-      Monomial(Rational(2), "x" -> 1),
-      Monomial(-Rational.one, "z" -> 1))
+      Monomial("xy"),
+      Monomial(2, "x"),
+      Monomial(-1, "z"))
     val b = Polynomial(
-      Monomial("x" -> 2),
-      Monomial(Rational(2), "y" -> 1),
-      Monomial(-Rational.one, "z" -> 1))
+      Monomial("xx"),
+      Monomial(2, "y"),
+      Monomial(-1, "z"))
 
     val spol = a sPoly b
 
     spol must beEqualTo(Polynomial(
-      Monomial(Rational(2), "x" -> 2),
-      Monomial(-Rational.one, "x" -> 1, "z" -> 1),
-      Monomial(Rational(-2), "y" -> 2),
-      Monomial("y" -> 1, "z" -> 1)))
+      Monomial(2, "xx"),
+      Monomial(-1, "xz"),
+      Monomial(-2, "yy"),
+      Monomial("yz")))
   }
 
   "Gröbner basis example 1" ! {
     // correct answer is
     // http://www.wolframalpha.com/input/?i=groebnerbasis%5B%7Bxy+%2B+2x+-+z%2C+x%5E2+%2B+2y+-+z%7D%5D
-    // 8 y+8 y^2+2 y^3-4 z-4 y z-y^2 z+z^2, 4 y+2 y^2-2 z+x z-y z, 2 x+x y-z, x^2+2 y-z
     // from http://www.scholarpedia.org/article/Groebner_bases (section: Construction of Gröbner bases)
     val a = Polynomial(
       Monomial("xy"),
@@ -73,7 +72,7 @@ class PolynomialSpec extends SpecBase {
       Monomial(2, "y"),
       Monomial(-1, "z"))
 
-    val basis = Polynomial.gröbnerBasis(Seq(a, b)).reduce().normalize()
+    val basis = PolynomialBasis(a, b).gröbner().reduce().normalize()
 
     val c = Polynomial(
       Monomial(-1, "xz"),
@@ -94,6 +93,5 @@ class PolynomialSpec extends SpecBase {
     )
 
     basis.dims.sorted mustEqual Seq(a, b, c, d).sorted
-    //    false must beTrue
   }
 }
