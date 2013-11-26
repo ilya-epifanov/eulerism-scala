@@ -1,6 +1,7 @@
 package ru.smartislav.poly.opt
 
 import spire.math.Rational
+import ru.smartislav.poly
 
 case class Monomial(c: Rational, pp: PowerProduct) {
   def *(f: Rational): Monomial = Monomial(c * f, pp)
@@ -47,7 +48,11 @@ object Monomial {
   val zero = Monomial(Rational.zero, new PowerProduct(null))
   val one = Monomial(Rational.one, new PowerProduct(null))
 
-  private abstract class MonomialOrderingUpToCoeff(val ord: Ordering[PowerProduct]) extends Ordering[Monomial] {
+  def apply(m: poly.Monomial)(implicit ctx: ExpressionContext): Monomial = {
+    Monomial(m.c, PowerProduct(m.powers.toSeq: _*))
+  }
+
+  private[opt] abstract class MonomialOrderingUpToCoeff(val ord: Ordering[PowerProduct]) extends Ordering[Monomial] {
     def compare(x: Monomial, y: Monomial): Int = ord.compare(x.pp, y.pp)
   }
 

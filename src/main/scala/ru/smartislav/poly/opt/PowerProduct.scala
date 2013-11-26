@@ -2,7 +2,6 @@ package ru.smartislav.poly.opt
 
 import scalaz.ImmutableArray
 import scala.collection._
-import scala.Predef.Map
 
 case class PowerProduct(factors: ImmutableArray[Int]) extends AnyVal {
   def *(p: PowerProduct): PowerProduct = {
@@ -31,8 +30,8 @@ case class PowerProduct(factors: ImmutableArray[Int]) extends AnyVal {
 }
 
 object PowerProduct {
-  def apply(powers: Map[String, Int])(implicit ctx: ExpressionContext): PowerProduct = {
-    new PowerProduct((0 until ctx.length).map(ix => powers(ctx.varName(ix)))(breakOut))
+  def apply(powers: (String, Int)*)(implicit ctx: ExpressionContext): PowerProduct = {
+    ctx.powerProduct(powers: _*)
   }
 
   object AscPurelexOrdering extends Ordering[PowerProduct] {
