@@ -3,6 +3,7 @@ package ru.smartislav.poly.opt
 import org.scalacheck.Prop
 import spire.math.Rational
 import ru.smartislav.SpecBase
+import ru.smartislav.poly.{monomial, nonZeroMonomial}
 import ru.smartislav.poly
 
 class MonomialSpec extends SpecBase {
